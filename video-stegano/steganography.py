@@ -87,7 +87,7 @@ def extract_audio(video_path, output_audio_path):
         raise RuntimeError(f"Gagal mengekstrak audio dari video: {e}")
     
 # Fungsi untuk membuat video dari frame
-def create_video_from_frames(frame_folder, output_video_path, fps=30):
+def create_video_from_frames(frame_folder, output_video_path, fps):
     logging.info(f"Membuat video dari frame di folder: {frame_folder}")
     
     # Ambil semua frame PNG
@@ -304,8 +304,6 @@ def embed_message_in_video(video_path, file_to_embed, output_video_path, key=Non
         logging.error(f"Frame {header_frame_index} gagal dimuat dari {header_frame_path}.")
         raise RuntimeError(f"Frame {header_frame_index} gagal dimuat dari {header_frame_path}.")
 
-    # Simpan salinan frame sebelum dimodifikasi
-    old_frame = header_frame.copy()
 
     # Sisipkan header pada frame pertama (pixel sekuensial)
     header_bits = ''.join(format(byte, '08b') for byte in header)
@@ -362,8 +360,10 @@ def embed_message_in_video(video_path, file_to_embed, output_video_path, key=Non
     cap = cv2.VideoCapture(video_path)
     # Ambil FPS
     fps = cap.get(cv2.CAP_PROP_FPS)
-    create_video_from_frames(frame_folder, output_video_path, fps)
     cap.release()
+    logging.info(f"FPS video: {fps}")
+    create_video_from_frames(frame_folder, output_video_path, fps)
+    
     temp = output_video_path.replace(".avi", "_noaudio.avi") 
     command = [
         "ffmpeg",

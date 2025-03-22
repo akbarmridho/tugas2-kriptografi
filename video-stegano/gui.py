@@ -3,7 +3,6 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import logging
 from steganography import embed_message_in_video, extract_message_from_video
-import time
 
 # GUI
 class SteganographyApp:
@@ -68,9 +67,8 @@ class SteganographyApp:
         self.label_psnr.grid(row=7, column=0, columnspan=3, padx=10, pady=10)
         
         # Inisialisasi VLC Instance
-        self.vlc_instance = vlc.Instance("--no-xlib")  # Nonaktifkan Xlib untuk menghindari error
+        self.vlc_instance = vlc.Instance()
         self.vlc_player = self.vlc_instance.media_player_new()
-        self.stego_video_path = None
     
     def browse_video(self):
         file_path = filedialog.askopenfilename(filetypes=[("Video Files", "*.mp4 *.avi")])
@@ -142,17 +140,9 @@ class SteganographyApp:
     
     def play_video(self):
         """Memutar video stego menggunakan VLC Player."""
-        if hasattr(self, 'stego_video_path') and self.stego_video_path:
+        if hasattr(self, 'stego_video_path'):
             media = self.vlc_instance.media_new(self.stego_video_path)
             self.vlc_player.set_media(media)
             self.vlc_player.play()
-            
-            # Tunggu hingga video selesai diputar
-            while self.vlc_player.is_playing():
-                time.sleep(1)
-            
-            # Hentikan dan bersihkan VLC Player setelah selesai
-            self.vlc_player.stop()
-            self.vlc_player.release()
         else:
             messagebox.showerror("Error", "Tidak ada video stego yang tersedia untuk diputar.")
